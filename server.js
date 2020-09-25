@@ -1,35 +1,36 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const Pusher = require("pusher");
-const Rooms = require("./dbRooms"); //Message collection
-const { v4: uuidV4 } = require("uuid");
-const app = express();
-const port = process.env.PORT || 9000; //heroku dev env or local env
+const express = require("express")
+const cors = require("cors")
+const mongoose = require("mongoose")
+const Pusher = require("pusher")
+const Rooms = require("./dbRooms") //Message collection
+const app = express()
+const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
   appId: "1067930",
   key: "9c1476dabbd8085397d7",
   secret: "3b7bd3eca4ba9a648358",
   cluster: "us3",
-  encrypted: true,
-});
-
+  encrypted: true
+})
+const corsOptions = {
+  origin: "http://localhost:3000",
+  methods: "GET,POST,PUT,PATCH,DELETE"
+}
 // pusher.trigger('my-channel', 'my-event', {
 //   'message': 'hello world'
 // });
 
 //middlewares
-app.use(express.json()); //parses incoming json objects
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"),
-    res.setHeader("Access-Control-Allow-Headers", "*"),
-    next();
-});
-
+app.use(express.json()) //parses incoming json objects
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*"), res.setHeader("Access-Control-Allow-Headers", "*"), next()
+// })
+app.use(cors(corsOptions))
 //endpoints
 app.get("/", (req, res) => {
-  res.status(200).send("Hello weorddddddld");
-});
+  res.status(200).send("Hello weorddddddld")
+})
 // app.get("/v1/messages/sync", (req, res) => {
 //   Messages.find((err, data) => {
 //     if (err) {
@@ -51,71 +52,98 @@ app.get("/", (req, res) => {
 // });
 
 //rooms
-app.get("/rooms/:roomId/messages/sync", (req, res) => {
+app.get("/rooms", (req, res) => {
   Rooms.find((err, data) => {
     if (err) {
-      res.status(500).send(err);
+      res.status(500).send(err)
     } else {
-      res.status(200).send(data);
+      res.status(200).send(data)
     }
-  });
-});
-app.post("/create-new-room", (req, res) => {
-  const roomInfo = req.body;
+  })
+})
+app.get("/rooms/:roomId/messages", (req, res) => {
+  Rooms.find({ _id: req.params.roomId }, (err, data) => {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(200).send(data)
+    }
+  })
+})
+
+app.post("/rooms/new", (req, res) => {
+  const roomInfo = req.body
+  console.log(roomInfo)
   Rooms.create(roomInfo, (err, data) => {
     if (err) {
-      res.status(500).send(err);
+      res.status(500).send(err)
     } else {
-      res.redirect(`rooms/${uuidV4()}/messages/sync`);
-      res.status(201).send(data);
+      res.status(201).send(data)
     }
-  });
-});
+  })
+})
 app.post("/rooms/:roomId/messages/new", (req, res) => {
-  const newMessage = req.body;
+  const newMessage = req.body
   //change messageContents in Rooms coollections
-  Rooms.update(
-    { messageContents: [...messageContents] },
-    { $set: { messageContents: [...messageContents, newMessage] } }
-  ).then((err, data) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.status(201).send(data);
+  async function updateMessage() {
+    try {
+      const result = await Rooms.updateOne({ _id: req.params.roomId }, { $push: { messageContents: newMessage } })
+      console.log("the real data: ", result)
+      res.status(201).send(result)
+    } catch (err) {
+      console.log("my err", err)
     }
-  });
-});
+  }
+  updateMessage()
+})
 
 //database
-const connection_url =
-  "mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority";
+const connection_url = "mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority"
 mongoose.connect(connection_url, {
   useCreateIndex: true,
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-const db = mongoose.connection;
+  useUnifiedTopology: true
+})
+const db = mongoose.connection
 db.once("open", () => {
-  console.log("DB connected");
-  const msgCollection = db.collection("messagecontents");
-  const changeStream = msgCollection.watch();
+  console.log("DB connected")
+  // const msgCollection = db.collection("messagecontents")
+  // const changeStream = msgCollection.watch()
+  const roomCollection = db.collection("rooms")
+  const changeStream = roomCollection.watch()
 
   //realtime db
-  changeStream.on("change", (change) => {
-    console.log(change);
-    if (change.operationType == "insert") {
-      const messageDetails = change.fullDocument;
-      pusher.trigger("messages", "inserted", {
-        name: messageDetails.name,
-        message: messageDetails.message,
-        timestamp: messageDetails.timestamp,
-        received: messageDetails.received,
-      });
-    } else {
-      console.log("Error triggering Pusher");
+  changeStream.on("change", change => {
+    console.log("my change", change)
+    if (change.operationType == "update") {
+      const messageDetails = change.updateDescription.updatedFields[Object.keys(change.updateDescription.updatedFields).toString()]
+      console.log("the main", Object.keys(change.updateDescription.updatedFields).toString())
+      console.log("the message", messageDetails)
+      console.log("the type", typeof messageDetails)
+      console.log("the type2", Array.isArray(messageDetails))
+
+      if (Array.isArray(messageDetails)) {
+        pusher.trigger("messages", "inserted", {
+          name: messageDetails[0].name,
+          message: messageDetails[0].message,
+          timestamp: messageDetails[0].timestamp,
+          received: messageDetails[0].received,
+          userId: messageDetails[0].userId,
+          roomId: messageDetails[0].roomId
+        })
+      } else {
+        pusher.trigger("messages", "inserted", {
+          name: messageDetails.name,
+          message: messageDetails.message,
+          timestamp: messageDetails.timestamp,
+          received: messageDetails.received,
+          userId: messageDetails.userId,
+          roomId: messageDetails.roomId
+        })
+      }
     }
-  });
-});
+  })
+})
 
 //listen
-app.listen(port, () => console.log(`Listening on localhost: ${port}`));
+app.listen(port, () => console.log(`Listening on localhost: ${port}`))
