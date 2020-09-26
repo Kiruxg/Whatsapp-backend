@@ -31,26 +31,6 @@ app.use(cors(corsOptions))
 app.get("/", (req, res) => {
   res.status(200).send("Hello weorddddddld")
 })
-// app.get("/v1/messages/sync", (req, res) => {
-//   Messages.find((err, data) => {
-//     if (err) {
-//       res.status(500).send(err);
-//     } else {
-//       res.status(200).send(data);
-//     }
-//   });
-// });
-// app.post("/v1/messages/new", (req, res) => {
-//   const dbMessage = req.body;
-//   Messages.create(dbMessage, (err, data) => {
-//     if (err) {
-//       res.status(500).send(err);
-//     } else {
-//       res.status(201).send(data);
-//     }
-//   });
-// });
-
 //rooms
 app.get("/rooms", (req, res) => {
   Rooms.find((err, data) => {
@@ -98,7 +78,7 @@ app.post("/rooms/:roomId/messages/new", (req, res) => {
 })
 
 //database
-const connection_url = "mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority"
+const connection_url = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gwrie.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
 mongoose.connect(connection_url, {
   useCreateIndex: true,
   useNewUrlParser: true,
