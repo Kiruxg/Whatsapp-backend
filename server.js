@@ -14,9 +14,10 @@ const pusher = new Pusher({
   encrypted: true
 })
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "https://whatsapp-mern-b640a.web.app/",
   methods: "GET,POST,PUT,PATCH,DELETE"
 }
+// "http://localhost:3000"
 // pusher.trigger('my-channel', 'my-event', {
 //   'message': 'hello world'
 // });
