@@ -29,7 +29,7 @@ app.use(express.json()) //parses incoming json objects
 app.use(cors(corsOptions))
 //endpoints
 app.get("/", (req, res) => {
-  res.status(200).send("Hello weorddddddld")
+  res.status(200).send("Whatsappweb-backend")
 })
 //rooms
 app.get("/rooms", (req, res) => {
