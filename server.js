@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const Pusher = require("pusher")
 const Rooms = require("./dbRooms") //Message collection
 const app = express()
-app.use(cors())
+// app.use(cors())
 const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
@@ -25,6 +25,11 @@ const pusher = new Pusher({
 // });
 
 //middlewares
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  next()
+})
 app.use((req, res, next) => {
   express.json()
   next()
