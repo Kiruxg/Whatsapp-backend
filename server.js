@@ -4,7 +4,10 @@ const mongoose = require("mongoose")
 const Pusher = require("pusher")
 const Rooms = require("./dbRooms") //Message collection
 const app = express()
-app.use(cors({ credentials: true, origin: true }))
+app.use(() => {
+  console.log("TESTTTTTTTTTTTT")
+  cors({ credentials: true, origin: true })
+})
 const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
