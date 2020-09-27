@@ -8,7 +8,7 @@ const app = express()
 //   console.log("TESTTTTTTTTTTTT")
 //   cors({ credentials: true, origin: true })
 // })
-const port = process.env.PORT || 9000 //heroku dev env or local env
+const port = process.env.PORT || 8000 //heroku dev env or local env
 
 const pusher = new Pusher({
   appId: "1067930",
