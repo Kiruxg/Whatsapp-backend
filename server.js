@@ -4,10 +4,10 @@ const mongoose = require("mongoose")
 const Pusher = require("pusher")
 const Rooms = require("./dbRooms") //Message collection
 const app = express()
-app.use(() => {
-  console.log("TESTTTTTTTTTTTT")
-  cors({ credentials: true, origin: true })
-})
+// app.use(() => {
+//   console.log("TESTTTTTTTTTTTT")
+//   cors({ credentials: true, origin: true })
+// })
 const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   express.json()
   next()
 }) //parses incoming json objects
-
+app.options("/rooms", cors()) // enable pre-flight request
 //endpoints
 app.get("/", (req, res) => {
   res.status(200).send("Whatsappweb-backend")
