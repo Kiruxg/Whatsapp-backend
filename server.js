@@ -99,8 +99,8 @@ app.post("/rooms/:roomId/messages/new", (req, res) => {
 })
 
 //database
-// const connection_url = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gwrie.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
-const connection_url = `mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority`
+const connection_url = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gwrie.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
+// const connection_url = `mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority`
 
 mongoose.connect(connection_url, {
   useCreateIndex: true,
