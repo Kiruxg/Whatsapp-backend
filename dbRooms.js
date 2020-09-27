@@ -5,8 +5,7 @@ const whatsappRoomsSchema = mongoose.Schema({
   roomSeed: Number,
   messageContents: Array,
   name: String,
-  timestamp: String,
-  received: Boolean
+  timestamp: String
 })
 
 module.exports = mongoose.model("rooms", whatsappRoomsSchema)

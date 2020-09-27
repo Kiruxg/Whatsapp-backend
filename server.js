@@ -8,7 +8,7 @@ const app = express()
 //   console.log("TESTTTTTTTTTTTT")
 //   cors({ credentials: true, origin: true })
 // })
-const port = process.env.PORT || 8000 //heroku dev env or local env
+const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
   appId: "1067930",
@@ -27,7 +27,8 @@ const pusher = new Pusher({
 // });
 
 //middlewares
-app.use(function (req, res, next) {
+app.use(express.json()) //parses incoming json objects
+app.use((req, res, next) => {
   // Website you wish to allow to connect
   res.setHeader("Access-Control-Allow-Origin", "*")
 
@@ -44,10 +45,7 @@ app.use(function (req, res, next) {
   // Pass to next layer of middleware
   next()
 })
-app.use((req, res, next) => {
-  express.json()
-  next()
-}) //parses incoming json objects
+
 //endpoints
 app.get("/", (req, res) => {
   res.status(200).send("Whatsappweb-backend")
@@ -74,7 +72,8 @@ app.get("/rooms/:roomId/messages", (req, res) => {
 
 app.post("/rooms/new", (req, res) => {
   const roomInfo = req.body
-  console.log(roomInfo)
+  console.log("LOOK HERE")
+  console.log("LOOK HERE2", req.body)
   Rooms.create(roomInfo, (err, data) => {
     if (err) {
       res.status(500).send(err)
@@ -99,8 +98,8 @@ app.post("/rooms/:roomId/messages/new", (req, res) => {
 })
 
 //database
-const connection_url = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gwrie.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
-// const connection_url = `mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority`
+// const connection_url = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gwrie.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
+const connection_url = "mongodb+srv://admin:Boy123kg@cluster0.gwrie.mongodb.net/whatsappdb?retryWrites=true&w=majority"
 
 mongoose.connect(connection_url, {
   useCreateIndex: true,
@@ -113,6 +112,7 @@ db.once("open", () => {
   // const msgCollection = db.collection("messagecontents")
   // const changeStream = msgCollection.watch()
   const roomCollection = db.collection("rooms")
+  // roomCollection.deleteMany({}) deletes all documents
   const changeStream = roomCollection.watch()
 
   //realtime db
