@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const Pusher = require("pusher")
 const Rooms = require("./dbRooms") //Message collection
 const app = express()
+app.use(cors())
 const port = process.env.PORT || 9000 //heroku dev env or local env
 
 const pusher = new Pusher({
@@ -45,7 +46,6 @@ app.use((req, res, next) => {
 //   // Pass to next layer of middleware
 //   next()
 // })
-app.use(cors())
 //endpoints
 app.get("/", (req, res) => {
   res.status(200).send("Whatsappweb-backend")
