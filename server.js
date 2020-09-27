@@ -24,7 +24,10 @@ const pusher = new Pusher({
 // });
 
 //middlewares
-app.use(express.json()) //parses incoming json objects
+app.use((req, res, next) => {
+  express.json()
+  next()
+}) //parses incoming json objects
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://whatsapp-mern-b640a.web.app"), res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE"), res.setHeader("Access-Control-Allow-Headers", "*"), next()
 })
