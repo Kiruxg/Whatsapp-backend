@@ -17,11 +17,10 @@ const pusher = new Pusher({
   cluster: "us3",
   encrypted: true
 })
-// const corsOptions = {
-//   origin: "*",
-//   methods: "GET,POST,PUT,PATCH,DELETE",
-//   allowedHeaders: "*"
-// }
+const corsOptions = {
+  origin: "*",
+  methods: "GET,POST,PUT,PATCH,DELETE"
+}
 // "http://localhost:3000"
 // pusher.trigger('my-channel', 'my-event', {
 //   'message': 'hello world'
@@ -49,7 +48,7 @@ app.use((req, res, next) => {
   express.json()
   next()
 }) //parses incoming json objects
-app.options("/rooms", cors()) // enable pre-flight request
+app.options("/rooms", cors(corsOptions)) // enable pre-flight request
 //endpoints
 app.get("/", (req, res) => {
   res.status(200).send("Whatsappweb-backend")
