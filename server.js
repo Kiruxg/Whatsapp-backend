@@ -17,38 +17,37 @@ const pusher = new Pusher({
   cluster: "us3",
   encrypted: true
 })
-const corsOptions = {
-  origin: "*",
-  methods: "GET,POST,PUT,PATCH,DELETE"
-}
+// const corsOptions = {
+//   origin: "*",
+//   methods: "GET,POST,PUT,PATCH,DELETE"
+// }
 // "http://localhost:3000"
 // pusher.trigger('my-channel', 'my-event', {
 //   'message': 'hello world'
 // });
 
 //middlewares
-// app.use(function (req, res, next) {
-//   // Website you wish to allow to connect
-//   res.setHeader("Access-Control-Allow-Origin", "https://whatsapp-mern-b640a.web.app")
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "*")
 
-//   // Request methods you wish to allow
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE")
+  // Request methods you wish to allow
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE")
 
-//   // Request headers you wish to allow
-//   res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type")
+  // Request headers you wish to allow
+  res.setHeader("Access-Control-Allow-Headers", "*")
 
-//   // Set to true if you need the website to include cookies in the requests sent
-//   // to the API (e.g. in case you use sessions)
-//   res.setHeader("Access-Control-Allow-Credentials", true)
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader("Access-Control-Allow-Credentials", true)
 
-//   // Pass to next layer of middleware
-//   next()
-// })
+  // Pass to next layer of middleware
+  next()
+})
 app.use((req, res, next) => {
   express.json()
   next()
 }) //parses incoming json objects
-app.options("/rooms", cors(corsOptions)) // enable pre-flight request
 //endpoints
 app.get("/", (req, res) => {
   res.status(200).send("Whatsappweb-backend")
